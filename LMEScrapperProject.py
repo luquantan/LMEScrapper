@@ -2,8 +2,9 @@ import pdb
 import pprint
 
 import LMENetworkManager as NetworkManager
+import LMEData
 
-from bs4 import BeautifulSoup # For HTML parsing
+
 
 # Purpose
 # To automate the retrival of daily LME settlement prices from the LME wesbite
@@ -23,8 +24,6 @@ def alumHTMLResponse():
 
 # Find out what date this data is valid for
 
-
-
-
-
 # Find out what is the current closing price 
+print "Copper price is: " + str(LMEData.retrieveBidPriceCashFor(copperHTMLResponse()))
+print "Alum price is: " + str(LMEData.retrieveBidPriceCashFor(alumHTMLResponse()))
