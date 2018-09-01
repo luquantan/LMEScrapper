@@ -1,6 +1,7 @@
 import pandas as pd
 import pdb
 from bs4 import BeautifulSoup # For HTML parsing
+import datefinder
 
 def parseHTMLResponse(raw_html):
     return BeautifulSoup(raw_html, 'html.parser')
@@ -28,6 +29,15 @@ def getTableBody(table):
         data.append([ele for ele in cols if ele]) # Get rid of empty values
     return data
 
+def getLatestDate(html):
+    date_tag = html.find('div' , attrs = {"class": "delayed-date left "})
+    tag_string = date_tag.string
+    date_generator = datefinder.find_dates(tag_string)
+    for datetime in date_generator:
+        latest_date = datetime
+    return latest_date
+
+
 def convertListToDataFrame(data_header, data):
     # Store Data as a Data Frame
     df = pd.DataFrame(data, columns=data_header[0])
@@ -48,13 +58,14 @@ def getRowName(contractType):
 
 def retrieveData(raw_html, priceType, contractType):
     html = parseHTMLResponse(raw_html)
+    latest_date = getLatestDate(html)
     table = getHTMLTable(html)
     data_header = getTableHeader(table)
     data = getTableBody(table)
     df = convertListToDataFrame(data_header, data)
     colName = getColumnName(priceType)
     rowName = getRowName(contractType)
-    return df[colName][rowName]
+    return (latest_date, df[colName][rowName])
 
 def retrieveBidPriceCashFor(raw_html):
     return retrieveData(raw_html, 'bid', 'cash')
